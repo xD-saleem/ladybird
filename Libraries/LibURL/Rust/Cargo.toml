@@ -9,4 +9,3 @@ name = "url_lib"
 path = "src/lib.rs"
 
 [dependencies]
-url = "2"
