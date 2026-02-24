@@ -1,5 +1,6 @@
 [workspace]
 members = [
     "Libraries/LibJS/Rust",
+    "Libraries/LibURL/Rust"
 ]
 resolver = "2"
