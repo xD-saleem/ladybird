@@ -1441,3 +1441,62 @@ fn encode_utf16(cp: u32, buffer: &mut Vec<u16>) {
         buffer.push((0xDC00 + (cp & 0x3FF)) as u16);
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn lex_all(source: &str) -> Vec<TokenType> {
+        // Convert UTF-8 -> UTF-16 like the lexer expects
+        let utf16: Vec<u16> = source.encode_utf16().collect();
+        let mut lexer = Lexer::new(&utf16, 1, 1);
+
+        let mut tokens = Vec::new();
+        loop {
+            let token = lexer.next();
+            tokens.push(token.token_type);
+            if token.token_type == TokenType::Eof {
+                break;
+            }
+        }
+        tokens
+    }
+
+    #[test]
+    fn lex_simple_identifier() {
+        let tokens = lex_all("hello");
+        assert_eq!(tokens, vec![TokenType::Identifier, TokenType::Eof]);
+    }
+
+    #[test]
+    fn lex_keyword() {
+        let tokens = lex_all("function");
+        assert_eq!(tokens, vec![TokenType::Function, TokenType::Eof]);
+    }
+
+    #[test]
+    fn lex_number() {
+        let tokens = lex_all("123");
+        assert_eq!(tokens, vec![TokenType::NumericLiteral, TokenType::Eof]);
+    }
+
+    #[test]
+    fn lex_string() {
+        let tokens = lex_all("\"abc\"");
+        assert_eq!(tokens, vec![TokenType::StringLiteral, TokenType::Eof]);
+    }
+
+    #[test]
+    fn lex_template_literal() {
+        let tokens = lex_all("`hello`");
+        assert_eq!(
+            tokens,
+            vec![
+                TokenType::TemplateLiteralStart,
+                TokenType::TemplateLiteralString,
+                TokenType::TemplateLiteralEnd,
+                TokenType::Eof,
+            ]
+        );
+    }
+}
