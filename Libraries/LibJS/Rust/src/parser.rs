@@ -678,7 +678,6 @@ impl<'a> Parser<'a> {
     }
 
     pub(crate) fn validate_regex_flags(&mut self, flags: &[u16]) {
-        // ASCII-only valid flags set
         const VALID_FLAGS: [bool; 128] = {
             let mut table = [false; 128];
             table[b'd' as usize] = true;
